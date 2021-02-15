@@ -109,7 +109,14 @@ public class DriveSubsystem extends SubsystemBase {
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
     SwerveDriveKinematics.normalizeWheelSpeeds(
-        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond(3));
+        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+SwerveModuleState frontLeft = swerveModuleStates[0];
+SwerveModuleState frontRight = swerveModuleStates[1];
+SwerveModuleState rearLeft = swerveModuleStates[2];
+SwerveModuleState rearRight = swerveModuleStates[3];
+//I feel like UwU right now
+
+
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);

@@ -62,7 +62,18 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling passing it to a
    * {@link JoystickButton}.
    */
-  private void configureButtonBindings() {}
+  private void configureButtonBindings() {
+    Runnable cheesyDrive = ()->{
+        double turn = deadzone(m_driverController.getX(GenericHID.Hand.kRight));
+        m_robotDrive.setModuleStates(
+          -deadzone(m_driverController.getY(GenericHID.Hand.kLeft)), 
+          turn, 
+          m_driverController.getBumper(GenericHID.Hand.kRight), (l,r)->{
+            //m_driveTrain.tankDriveVolts(l*10, r*10);
+            m_driveTrain.normalTank(l, r);
+          });
+      };
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -113,4 +124,13 @@ public class RobotContainer {
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
   }
+  public static double deadzone(double x) { //DZ = 0.15
+    return deadzone(x, 0.15);}
+    public static double deadzone(double x, double dz) {
+        if (Math.abs(x) < dz) {
+          return 0;
+        } else {
+          return x;
+        }
+      }
 }

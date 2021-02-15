@@ -57,17 +57,15 @@ public final class Constants {
     public static final double kWheelBase = 0.4953;
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
-        new Translation2d(kWheelBase, kTrackWidth), new Translation2d(kWheelBase, -kTrackWidth),
-        new Translation2d(-kWheelBase, kTrackWidth), new Translation2d(-kWheelBase, -kTrackWidth));
+        new Translation2d(2/kWheelBase, 2/kTrackWidth), new Translation2d(2/kWheelBase, 2/-kTrackWidth),
+        new Translation2d(2/-kWheelBase, 2/kTrackWidth), new Translation2d(2/-kWheelBase, 2/-kTrackWidth));
     // Creating my odometry object from the kinematics object. Here,
     // our starting pose is 5 meters along the long end of the field and in the
     // center of the field along the short end, facing forward.
     SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(kDriveKinematics, getGyroHeading());
     public static final boolean kGyroReversed = false;
-	public static double kMaxSpeedMetersPerSecond(int i) {
-		return 0;
-	}
-
+	public static double kMaxSpeedMetersPerSecond = 3;
+	
   }
 
   public static final class ModuleConstants {
