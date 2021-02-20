@@ -63,15 +63,30 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    Runnable cheesyDrive = ()->{
-        double turn = deadzone(m_driverController.getX(GenericHID.Hand.kRight));
-        m_robotDrive.setModuleStates(
-          -deadzone(m_driverController.getY(GenericHID.Hand.kLeft)), 
-          turn, 
-          m_driverController.getBumper(GenericHID.Hand.kRight), (l,r)->{
-            //m_driveTrain.tankDriveVolts(l*10, r*10);
-            m_driveTrain.normalTank(l, r);
-          });
+    // Runnable cheesyDrive = ()->{
+    //     double turn = deadzone(m_driverController.getX(GenericHID.Hand.kRight));
+    //     m_robotDrive.drive(
+    //       -deadzone(m_driverController.getY(GenericHID.Hand.kLeft)), 
+    //       turn, 
+    //       m_driverController.getBumper(GenericHID.Hand.kRight), (l,r)->{
+      //       m_driveTrain.tankDriveVolts(l*10, r*10);
+      //       m_driveTrain.normalTank(l, r);
+      //     });
+      // };
+      Runnable Control = ()->{
+        m_driverController.getY(GenericHID.Hand.kLeft);
+        m_driverController.getX(GenericHID.Hand.kLeft);
+        m_driverController.getX(GenericHID.Hand.kRight);
+
+        //create variables for controls
+
+       double driverGetY = m_driverController.getY(GenericHID.Hand.kLeft);
+       double driverGetX = m_driverController.getX(GenericHID.Hand.kLeft);
+       double driverGetROT = m_driverController.getX(GenericHID.Hand.kRight);
+
+       //Call the Method
+
+       drive() ;
       };
   }
 
