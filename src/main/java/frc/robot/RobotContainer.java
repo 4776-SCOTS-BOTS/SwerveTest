@@ -78,7 +78,7 @@ public class RobotContainer {
         m_driverController.getX(GenericHID.Hand.kLeft);
         m_driverController.getX(GenericHID.Hand.kRight);
 
-        //create variables for controls
+        //Create variables for controls
 
        double driverGetY = m_driverController.getY(GenericHID.Hand.kLeft);
        double driverGetX = m_driverController.getX(GenericHID.Hand.kLeft);
@@ -86,7 +86,7 @@ public class RobotContainer {
 
        //Call the Method
 
-       m_robotDrive.drive( xSpeed,  ySpeed,  rot,  fieldRelative)  );
+       m_robotDrive.drive(driverGetX, driverGetY, driverGetROT);
       };
   }
 
