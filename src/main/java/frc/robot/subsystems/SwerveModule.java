@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import frc.robot.Constants.ModuleConstants;
@@ -13,11 +12,17 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
-public class SwerveModule {
-  private final Spark m_driveMotor;
-  private final Spark m_turningMotor;
+import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.revrobotics.CANEncoder;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-  private final Encoder m_driveEncoder;
+public class SwerveModule {
+  private final CANSparkMax m_driveMotor;
+  private final VictorSPX m_turningMotor;
+
+  private final CANEncoder m_driveEncoder;
   private final Encoder m_turningEncoder;
 
   private final PIDController m_drivePIDController =
@@ -35,33 +40,25 @@ public class SwerveModule {
 
   /**
    * Constructs a SwerveModule.
-   *
    * @param driveMotorChannel ID for the drive motor.
    * @param turningMotorChannel ID for the turning motor.
    */
   public SwerveModule(
       int driveMotorChannel,
       int turningMotorChannel,
-      int[] driveEncoderPorts,
       int[] turningEncoderPorts,
       boolean driveEncoderReversed,
       boolean turningEncoderReversed) {
 
-    m_driveMotor = new Spark(driveMotorChannel);
-    m_turningMotor = new Spark(turningMotorChannel);
+    m_driveMotor = new CANSparkMax (driveMotorChannel, MotorType.kBrushless);
+    m_turningMotor = new VictorSPX(turningMotorChannel);
 
-    this.m_driveEncoder = new Encoder(driveEncoderPorts[0], driveEncoderPorts[1]);
+    this.m_driveEncoder = m_driveMotor.getEncoder();
 
     this.m_turningEncoder = new Encoder(turningEncoderPorts[0], turningEncoderPorts[1]);
 
-    // Set the distance per pulse for the drive encoder. We can simply use the
-    // distance traveled for one rotation of the wheel divided by the encoder
-    // resolution.
-    m_driveEncoder.setDistancePerPulse(ModuleConstants.kDriveEncoderDistancePerPulse);
-
-    // Set whether drive encoder should be reversed or not
-    m_driveEncoder.setReverseDirection(driveEncoderReversed);
-
+m_driveEncoder.setPositionConversionFactor(ModuleConstants.kRevolutionsToMeters);
+m_driveEncoder.setVelocityConversionFactor(ModuleConstants.kRPMToMetersPerSecond);
     // Set the distance (in this case, angle) per pulse for the turning encoder.
     // This is the the angle through an entire rotation (2 * wpi::math::pi)
     // divided by the encoder resolution.
@@ -81,7 +78,7 @@ public class SwerveModule {
    * @return The current state of the module.
    */
   public SwerveModuleState getState() {
-    return new SwerveModuleState(m_driveEncoder.getRate(), new Rotation2d(m_turningEncoder.get()));
+    return new SwerveModuleState(m_driveEncoder.getVelocity(), new Rotation2d(m_turningEncoder.get()));
   }
 
   /**
@@ -96,7 +93,7 @@ public class SwerveModule {
 
     // Calculate the drive output from the drive PID controller.
     final double driveOutput =
-        m_drivePIDController.calculate(m_driveEncoder.getRate(), state.speedMetersPerSecond);
+        m_drivePIDController.calculate(m_driveEncoder.getVelocity(), state.speedMetersPerSecond);
 
     // Calculate the turning motor output from the turning PID controller.
     final var turnOutput =
@@ -104,12 +101,12 @@ public class SwerveModule {
 
     // Calculate the turning motor output from the turning PID controller.
     m_driveMotor.set(driveOutput);
-    m_turningMotor.set(turnOutput);
+    m_turningMotor.set(VictorSPXControlMode.PercentOutput,turnOutput);
   }
 
   /** Zeros all the SwerveModule encoders. */
   public void resetEncoders() {
-    m_driveEncoder.reset();
+    m_driveEncoder.setPosition(0);
     m_turningEncoder.reset();
   }
 }
