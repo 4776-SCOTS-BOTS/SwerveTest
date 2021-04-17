@@ -80,16 +80,24 @@ public class RobotContainer {
 
         //Create variables for controls
 
-       double driverGetY = m_driverController.getY(GenericHID.Hand.kLeft);
-       double driverGetX = m_driverController.getX(GenericHID.Hand.kLeft);
-       double driverGetROT = m_driverController.getX(GenericHID.Hand.kRight);
-
+       double driverGetY = new_deadzone(-m_driverController.getY(GenericHID.Hand.kLeft));
+       double driverGetX = new_deadzone(m_driverController.getX(GenericHID.Hand.kLeft));
+       double driverGetROT = new_deadzone(m_driverController.getX(GenericHID.Hand.kRight));
+System.out.println("DriverInput"+driverGetY+","+driverGetX+","+driverGetROT);
        //Call the Method
 
-       m_robotDrive.drive(driverGetX, driverGetY, driverGetROT, false);
+       m_robotDrive.drive(driverGetY, driverGetX, driverGetROT, false);
       };
       m_robotDrive.setDefaultCommand(new RunCommand(Control,m_robotDrive));
   }
+double new_deadzone(double x) {
+  if (Math.abs(x) > 0.09) {
+return x;
+  }
+  else {
+    return 0;
+  }
+}
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

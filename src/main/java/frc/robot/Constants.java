@@ -52,12 +52,11 @@ public final class Constants {
     public static final double kWheelBase = 0.4953;
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
-        new Translation2d(2/kWheelBase, 2/kTrackWidth), new Translation2d(2/kWheelBase, 2/-kTrackWidth),
-        new Translation2d(2/-kWheelBase, 2/kTrackWidth), new Translation2d(2/-kWheelBase, 2/-kTrackWidth));
+        new Translation2d(kWheelBase/2, kTrackWidth/2), new Translation2d(kWheelBase/2, -kTrackWidth/2),
+        new Translation2d(-kWheelBase/2, kTrackWidth/2), new Translation2d(-kWheelBase/2, -kTrackWidth/2));
     // Creating my odometry object from the kinematics object. Here,
     // our starting pose is 5 meters along the long end of the field and in the
     // center of the field along the short end, facing forward.
-    SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(kDriveKinematics, getGyroHeading());
     public static final boolean kGyroReversed = false;
 	public static double kMaxSpeedMetersPerSecond = 3;
 	
@@ -78,15 +77,15 @@ public final class Constants {
         (2 * Math.PI) / (double) kEncoderCPR;
 
         public static double kMaxRPM = 5700;
-        public static double kWheelDiameter = 0.152;
+        public static double kWheelDiameter = 0.102;
         public static double kMotorGearsToWheelGears = 6.67;
         public static double kRevolutionsToMeters = Math.PI * kWheelDiameter / kMotorGearsToWheelGears;
         public static double kRPMToMetersPerSecond = Math.PI * kWheelDiameter / (60 * kMotorGearsToWheelGears);
 
 
-    public static final double kPModuleTurningController = 1;
+    public static final double kPModuleTurningController = 0.3;
 
-    public static final double kPModuleDriveController = 1;
+    public static final double kPModuleDriveController = 0.3;
   }
 
   public static final class OIConstants {
@@ -106,9 +105,5 @@ public final class Constants {
     // Constraint for the motion profilied robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
         kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
-  }
-
-  public static Rotation2d getGyroHeading() {
-    return null;
   }
 }

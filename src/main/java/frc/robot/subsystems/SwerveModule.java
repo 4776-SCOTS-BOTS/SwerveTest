@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import frc.robot.Constants.ModuleConstants;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
@@ -21,7 +22,8 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 public class SwerveModule {
   private final CANSparkMax m_driveMotor;
   private final VictorSPX m_turningMotor;
-
+  private final boolean InvertLeft;
+  private final boolean InvertBack;
   private final CANEncoder m_driveEncoder;
   private final Encoder m_turningEncoder;
 
@@ -48,15 +50,21 @@ public class SwerveModule {
       int turningMotorChannel,
       int[] turningEncoderPorts,
       boolean driveEncoderReversed,
-      boolean turningEncoderReversed) {
+      boolean turningEncoderReversed,
+      boolean is_invertedLeft,
+      boolean is_invertedBack)
+       {
 
     m_driveMotor = new CANSparkMax (driveMotorChannel, MotorType.kBrushless);
+    m_driveMotor.setInverted(is_invertedLeft);
     m_turningMotor = new VictorSPX(turningMotorChannel);
 
     this.m_driveEncoder = m_driveMotor.getEncoder();
-
+//m_driveEncoder.setInverted(is_invertedLeft);
     this.m_turningEncoder = new Encoder(turningEncoderPorts[0], turningEncoderPorts[1]);
 
+    InvertLeft = is_invertedLeft;
+    InvertBack = is_invertedBack;
 m_driveEncoder.setPositionConversionFactor(ModuleConstants.kRevolutionsToMeters);
 m_driveEncoder.setVelocityConversionFactor(ModuleConstants.kRPMToMetersPerSecond);
     // Set the distance (in this case, angle) per pulse for the turning encoder.
@@ -70,7 +78,13 @@ m_driveEncoder.setVelocityConversionFactor(ModuleConstants.kRPMToMetersPerSecond
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.
     m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
+
+Shuffleboard.getTab("swere").addNumber("SwerveModouleTurning"+turningMotorChannel, this::getAngleRadians);
+    Shuffleboard.getTab("Swerve").addNumber("SwerveModule"+driveMotorChannel, m_driveEncoder::getPosition);
   }
+private double getAngleRadians() {
+  return (InvertBack? -1 : 1) * m_turningEncoder.get() * 2 * Math.PI / 418;
+}
 
   /**
    * Returns the current state of the module.
@@ -78,7 +92,8 @@ m_driveEncoder.setVelocityConversionFactor(ModuleConstants.kRPMToMetersPerSecond
    * @return The current state of the module.
    */
   public SwerveModuleState getState() {
-    return new SwerveModuleState(m_driveEncoder.getVelocity(), new Rotation2d(m_turningEncoder.get()));
+    return new SwerveModuleState(m_driveEncoder.getVelocity(), new Rotation2d(getAngleRadians()));
+   // return new SwerveModuleState(m_driveEncoder.getVelocity(), new Rotation2d(m_turningEncoder.get()));
   }
 
   /**
@@ -89,7 +104,8 @@ m_driveEncoder.setVelocityConversionFactor(ModuleConstants.kRPMToMetersPerSecond
   public void setDesiredState(SwerveModuleState desiredState) {
     // Optimize the reference state to avoid spinning further than 90 degrees
     SwerveModuleState state =
-        SwerveModuleState.optimize(desiredState, new Rotation2d(m_turningEncoder.get()));
+    SwerveModuleState.optimize(desiredState, new Rotation2d(getAngleRadians()));
+    //SwerveModuleState.optimize(desiredState, new Rotation2d(m_turningEncoder.get()));
 
     // Calculate the drive output from the drive PID controller.
     final double driveOutput =
@@ -97,8 +113,8 @@ m_driveEncoder.setVelocityConversionFactor(ModuleConstants.kRPMToMetersPerSecond
 
     // Calculate the turning motor output from the turning PID controller.
     final var turnOutput =
-        m_turningPIDController.calculate(m_turningEncoder.get(), state.angle.getRadians());
-
+        m_turningPIDController.calculate(getAngleRadians(), state.angle.getRadians());
+        System.out.println("State: "+state.angle.getRadians()+" Compared to our "+getAngleRadians()+" result is "+turnOutput);
     // Calculate the turning motor output from the turning PID controller.
     m_driveMotor.set(driveOutput);
     m_turningMotor.set(VictorSPXControlMode.PercentOutput,turnOutput);

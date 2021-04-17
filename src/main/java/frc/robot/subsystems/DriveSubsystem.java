@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 @SuppressWarnings("PMD.ExcessiveImports")
@@ -24,7 +25,7 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kFrontLeftTurningMotorPort,
           DriveConstants.kFrontLeftTurningEncoderPorts,
           DriveConstants.kFrontLeftDriveEncoderReversed,
-          DriveConstants.kFrontLeftTurningEncoderReversed);
+          DriveConstants.kFrontLeftTurningEncoderReversed,true,false);
 
   private final SwerveModule m_rearLeft =
       new SwerveModule(
@@ -32,7 +33,7 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kRearLeftTurningMotorPort,
           DriveConstants.kRearLeftTurningEncoderPorts,
           DriveConstants.kRearLeftDriveEncoderReversed,
-          DriveConstants.kRearLeftTurningEncoderReversed);
+          DriveConstants.kRearLeftTurningEncoderReversed,true,true);
 
   private final SwerveModule m_frontRight =
       new SwerveModule(
@@ -40,7 +41,7 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kFrontRightTurningMotorPort,
           DriveConstants.kFrontRightTurningEncoderPorts,
           DriveConstants.kFrontRightDriveEncoderReversed,
-          DriveConstants.kFrontRightTurningEncoderReversed);
+          DriveConstants.kFrontRightTurningEncoderReversed,false,false);
 
   private final SwerveModule m_rearRight =
       new SwerveModule(
@@ -48,7 +49,7 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kRearRightTurningMotorPort,
           DriveConstants.kRearRightTurningEncoderPorts,
           DriveConstants.kRearRightDriveEncoderReversed,
-          DriveConstants.kRearRightTurningEncoderReversed);
+          DriveConstants.kRearRightTurningEncoderReversed,false,true);
 
   // The gyro sensor
   private final Gyro m_gyro = new ADXRS450_Gyro();
@@ -58,16 +59,21 @@ public class DriveSubsystem extends SubsystemBase {
       new SwerveDriveOdometry(DriveConstants.kDriveKinematics, m_gyro.getRotation2d());
 
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {}
+  public DriveSubsystem() {
+    Shuffleboard.getTab("Swerve").addNumber("Odometry X Position", ()->this.getPose().getX());
+    Shuffleboard.getTab("Swerve").addNumber("Odometry Y Position", ()->this.getPose().getY());
+    Shuffleboard.getTab("Swerve").addNumber("Odometry Rotation", ()->this.getPose().getRotation().getDegrees());
+  }
 
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
     m_odometry.update(
-        new Rotation2d(getHeading()),
+//        new Rotation2d(getHeading()),
+m_gyro.getRotation2d(),
         m_frontLeft.getState(),
-        m_rearLeft.getState(),
         m_frontRight.getState(),
+        m_rearLeft.getState(),
         m_rearRight.getState());
   }
 
