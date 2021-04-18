@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
@@ -26,6 +27,7 @@ public class SwerveModule {
   private final boolean InvertBack;
   private final CANEncoder m_driveEncoder;
   private final Encoder m_turningEncoder;
+  private double turningEncoderCounts;
 
   private final PIDController m_drivePIDController =
       new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
@@ -52,9 +54,11 @@ public class SwerveModule {
       boolean driveEncoderReversed,
       boolean turningEncoderReversed,
       boolean is_invertedLeft,
-      boolean is_invertedBack)
+      boolean is_invertedBack,
+      double encoderCounts)
        {
-
+    
+    turningEncoderCounts = encoderCounts;
     m_driveMotor = new CANSparkMax (driveMotorChannel, MotorType.kBrushless);
     m_driveMotor.setInverted(is_invertedLeft);
     m_turningMotor = new VictorSPX(turningMotorChannel);
@@ -80,10 +84,13 @@ m_driveEncoder.setVelocityConversionFactor(ModuleConstants.kRPMToMetersPerSecond
     m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
 Shuffleboard.getTab("swere").addNumber("SwerveModouleTurning"+turningMotorChannel, this::getAngleRadians);
-    Shuffleboard.getTab("Swerve").addNumber("SwerveModule"+driveMotorChannel, m_driveEncoder::getPosition);
+    // Shuffleboard.getTab("Swerve").addNumber("SwerveModule"+driveMotorChannel, m_driveEncoder::getPosition);
+    Shuffleboard.getTab("Swerve").addNumber("SwerveModule"+driveMotorChannel, this::getDrivePosition);
   }
 private double getAngleRadians() {
-  return (InvertBack? -1 : 1) * m_turningEncoder.get() * 2 * Math.PI / 418;
+  return (InvertBack? -1.0 : 1.0) * m_turningEncoder.get() * turningEncoderCounts;
+  // return (InvertBack? -1 : 1) * m_turningEncoder.get();
+  // return (InvertBack? -1 : 1) * m_turningEncoder.get() * 2 * Math.PI / 418;
 }
 
   /**
@@ -92,8 +99,15 @@ private double getAngleRadians() {
    * @return The current state of the module.
    */
   public SwerveModuleState getState() {
-    return new SwerveModuleState(m_driveEncoder.getVelocity(), new Rotation2d(getAngleRadians()));
+    return new SwerveModuleState(getDriveVelocity(), new Rotation2d(getAngleRadians()));
    // return new SwerveModuleState(m_driveEncoder.getVelocity(), new Rotation2d(m_turningEncoder.get()));
+  }
+
+  public double getDrivePosition() {
+    return (InvertLeft? -1 : 1) * m_driveEncoder.getPosition();
+  }
+  public double getDriveVelocity() {
+    return (InvertLeft? -1 : 1) * m_driveEncoder.getVelocity();
   }
 
   /**
@@ -108,8 +122,10 @@ private double getAngleRadians() {
     //SwerveModuleState.optimize(desiredState, new Rotation2d(m_turningEncoder.get()));
 
     // Calculate the drive output from the drive PID controller.
-    final double driveOutput =
-        m_drivePIDController.calculate(m_driveEncoder.getVelocity(), state.speedMetersPerSecond);
+    // final double driveOutput =
+    //     m_drivePIDController.calculate(m_driveEncoder.getVelocity(), state.speedMetersPerSecond);
+
+    final double driveOutput = (InvertLeft? -1 : 1) * state.speedMetersPerSecond / DriveConstants.kMaxSpeedMetersPerSecond;
 
     // Calculate the turning motor output from the turning PID controller.
     final var turnOutput =

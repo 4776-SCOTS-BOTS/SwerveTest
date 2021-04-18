@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.ModuleConstants;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
@@ -25,7 +26,9 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kFrontLeftTurningMotorPort,
           DriveConstants.kFrontLeftTurningEncoderPorts,
           DriveConstants.kFrontLeftDriveEncoderReversed,
-          DriveConstants.kFrontLeftTurningEncoderReversed,true,false);
+          DriveConstants.kFrontLeftTurningEncoderReversed,
+          true,false,
+          ModuleConstants.kFrontLeftTurningEncoderCounts);
 
   private final SwerveModule m_rearLeft =
       new SwerveModule(
@@ -33,7 +36,9 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kRearLeftTurningMotorPort,
           DriveConstants.kRearLeftTurningEncoderPorts,
           DriveConstants.kRearLeftDriveEncoderReversed,
-          DriveConstants.kRearLeftTurningEncoderReversed,true,true);
+          DriveConstants.kRearLeftTurningEncoderReversed,
+          true,true,
+          ModuleConstants.kRearLeftTurningEncoderCounts);
 
   private final SwerveModule m_frontRight =
       new SwerveModule(
@@ -41,7 +46,9 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kFrontRightTurningMotorPort,
           DriveConstants.kFrontRightTurningEncoderPorts,
           DriveConstants.kFrontRightDriveEncoderReversed,
-          DriveConstants.kFrontRightTurningEncoderReversed,false,false);
+          DriveConstants.kFrontRightTurningEncoderReversed,
+          false,false,
+          ModuleConstants.kFrontRightTurningEncoderCounts);
 
   private final SwerveModule m_rearRight =
       new SwerveModule(
@@ -49,7 +56,9 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kRearRightTurningMotorPort,
           DriveConstants.kRearRightTurningEncoderPorts,
           DriveConstants.kRearRightDriveEncoderReversed,
-          DriveConstants.kRearRightTurningEncoderReversed,false,true);
+          DriveConstants.kRearRightTurningEncoderReversed,
+          false,true,
+          ModuleConstants.kRearRightTurningEncoderCounts);
 
   // The gyro sensor
   private final Gyro m_gyro = new ADXRS450_Gyro();

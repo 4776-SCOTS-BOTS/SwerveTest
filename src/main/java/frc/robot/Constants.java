@@ -47,9 +47,10 @@ public final class Constants {
     public static final boolean kFrontRightDriveEncoderReversed = false;
     public static final boolean kRearRightDriveEncoderReversed = true;
 
+
     public static final double kTrackWidth = 0.587375;
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = 0.4953;
+    public static final double kWheelBase = 0.587375; // actually is 0.4953;
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
         new Translation2d(kWheelBase/2, kTrackWidth/2), new Translation2d(kWheelBase/2, -kTrackWidth/2),
@@ -76,16 +77,21 @@ public final class Constants {
         // Assumes the encoders are on a 1:1 reduction with the module shaft.
         (2 * Math.PI) / (double) kEncoderCPR;
 
-        public static double kMaxRPM = 5700;
-        public static double kWheelDiameter = 0.102;
-        public static double kMotorGearsToWheelGears = 6.67;
-        public static double kRevolutionsToMeters = Math.PI * kWheelDiameter / kMotorGearsToWheelGears;
-        public static double kRPMToMetersPerSecond = Math.PI * kWheelDiameter / (60 * kMotorGearsToWheelGears);
+    public static double kMaxRPM = 5700;
+    public static double kWheelDiameter = 0.102;
+    public static double kMotorGearsToWheelGears = 6.67;
+    public static double kRevolutionsToMeters = Math.PI * kWheelDiameter / kMotorGearsToWheelGears;
+    public static double kRPMToMetersPerSecond = Math.PI * kWheelDiameter / (60 * kMotorGearsToWheelGears);
 
 
-    public static final double kPModuleTurningController = 0.3;
+    public static final double kPModuleTurningController = 0.6;
 
-    public static final double kPModuleDriveController = 0.3;
+    public static final double kPModuleDriveController = 0.6;
+
+    public static final double kFrontLeftTurningEncoderCounts = 2 * Math.PI / 415.1;
+    public static final double kFrontRightTurningEncoderCounts = 2 * Math.PI / 415.6;
+    public static final double kRearLeftTurningEncoderCounts = 2 * Math.PI / 415.2;
+    public static final double kRearRightTurningEncoderCounts = 2 * Math.PI / 415.7;
   }
 
   public static final class OIConstants {

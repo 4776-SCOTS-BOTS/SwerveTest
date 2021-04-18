@@ -15,6 +15,8 @@ import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
@@ -80,13 +82,12 @@ public class RobotContainer {
 
         //Create variables for controls
 
-       double driverGetY = new_deadzone(-m_driverController.getY(GenericHID.Hand.kLeft));
-       double driverGetX = new_deadzone(m_driverController.getX(GenericHID.Hand.kLeft));
-       double driverGetROT = new_deadzone(m_driverController.getX(GenericHID.Hand.kRight));
-System.out.println("DriverInput"+driverGetY+","+driverGetX+","+driverGetROT);
-       //Call the Method
-
-       m_robotDrive.drive(driverGetY, driverGetX, driverGetROT, false);
+        double driverGetY = new_deadzone(-m_driverController.getY(GenericHID.Hand.kLeft));
+        double driverGetX = new_deadzone(m_driverController.getX(GenericHID.Hand.kLeft));
+        double driverGetROT = new_deadzone(m_driverController.getX(GenericHID.Hand.kRight));
+        System.out.println("DriverInput"+driverGetY+","+driverGetX+","+driverGetROT);
+        //Call the Method
+        m_robotDrive.drive(-driverGetY, driverGetX, driverGetROT, true);
       };
       m_robotDrive.setDefaultCommand(new RunCommand(Control,m_robotDrive));
   }
