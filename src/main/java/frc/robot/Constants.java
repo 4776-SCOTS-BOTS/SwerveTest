@@ -84,7 +84,7 @@ public final class Constants {
     public static double kRPMToMetersPerSecond = Math.PI * kWheelDiameter / (60 * kMotorGearsToWheelGears);
 
 
-    public static final double kPModuleTurningController = 0.6;
+    public static final double kPModuleTurningController = 0.75;
 
     public static final double kPModuleDriveController = 0.6;
 

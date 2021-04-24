@@ -82,12 +82,16 @@ public class RobotContainer {
 
         //Create variables for controls
 
-        double driverGetY = new_deadzone(-m_driverController.getY(GenericHID.Hand.kLeft));
-        double driverGetX = new_deadzone(m_driverController.getX(GenericHID.Hand.kLeft));
-        double driverGetROT = new_deadzone(m_driverController.getX(GenericHID.Hand.kRight));
-        System.out.println("DriverInput"+driverGetY+","+driverGetX+","+driverGetROT);
+        //Swerve xSpeed is the vertical/forward movement
+        double xSpeed = new_deadzone(m_driverController.getY(GenericHID.Hand.kLeft));
+        //Swerve ySpeed is the sideways left/right movement
+        double ySpeed = new_deadzone(m_driverController.getX(GenericHID.Hand.kLeft));
+        //Swerve rotation is the counter-clockwise rotation of the robot
+        double rotation = new_deadzone(m_driverController.getX(GenericHID.Hand.kRight));
+        // System.out.println("DriverInput"+driverGetY+","+driverGetX+","+driverGetROT);
         //Call the Method
-        m_robotDrive.drive(-driverGetY, driverGetX, driverGetROT, true);
+        // m_robotDrive.drive(-driverGetY, driverGetX, driverGetROT, true);
+        m_robotDrive.drive(xSpeed, ySpeed, rotation, true);
       };
       m_robotDrive.setDefaultCommand(new RunCommand(Control,m_robotDrive));
   }

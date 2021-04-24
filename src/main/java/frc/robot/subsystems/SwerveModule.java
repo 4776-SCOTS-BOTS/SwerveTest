@@ -71,6 +71,7 @@ public class SwerveModule {
     InvertBack = is_invertedBack;
 m_driveEncoder.setPositionConversionFactor(ModuleConstants.kRevolutionsToMeters);
 m_driveEncoder.setVelocityConversionFactor(ModuleConstants.kRPMToMetersPerSecond);
+
     // Set the distance (in this case, angle) per pulse for the turning encoder.
     // This is the the angle through an entire rotation (2 * wpi::math::pi)
     // divided by the encoder resolution.
@@ -86,6 +87,7 @@ m_driveEncoder.setVelocityConversionFactor(ModuleConstants.kRPMToMetersPerSecond
 Shuffleboard.getTab("swere").addNumber("SwerveModouleTurning"+turningMotorChannel, this::getAngleRadians);
     // Shuffleboard.getTab("Swerve").addNumber("SwerveModule"+driveMotorChannel, m_driveEncoder::getPosition);
     Shuffleboard.getTab("Swerve").addNumber("SwerveModule"+driveMotorChannel, this::getDrivePosition);
+    resetEncoders();
   }
 private double getAngleRadians() {
   return (InvertBack? -1.0 : 1.0) * m_turningEncoder.get() * turningEncoderCounts;
