@@ -88,9 +88,7 @@ public class RobotContainer {
         double ySpeed = new_deadzone(m_driverController.getX(GenericHID.Hand.kLeft));
         //Swerve rotation is the counter-clockwise rotation of the robot
         double rotation = new_deadzone(m_driverController.getX(GenericHID.Hand.kRight));
-        // System.out.println("DriverInput"+driverGetY+","+driverGetX+","+driverGetROT);
         //Call the Method
-        // m_robotDrive.drive(-driverGetY, driverGetX, driverGetROT, true);
         m_robotDrive.drive(xSpeed, ySpeed, rotation, true);
       };
       m_robotDrive.setDefaultCommand(new RunCommand(Control,m_robotDrive));
@@ -153,13 +151,4 @@ return x;
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
   }
-  public static double deadzone(double x) { //DZ = 0.15
-    return deadzone(x, 0.15);}
-    public static double deadzone(double x, double dz) {
-        if (Math.abs(x) < dz) {
-          return 0;
-        } else {
-          return x;
-        }
-      }
-}
+  }

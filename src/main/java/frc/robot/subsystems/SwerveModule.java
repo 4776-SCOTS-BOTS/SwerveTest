@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
+import java.security.PublicKey;
+
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANEncoder;
@@ -89,7 +91,15 @@ Shuffleboard.getTab("swere").addNumber("SwerveModouleTurning"+turningMotorChanne
     Shuffleboard.getTab("Swerve").addNumber("SwerveModule"+driveMotorChannel, this::getDrivePosition);
     resetEncoders();
   }
-private double getAngleRadians() {
+  public double getConstrictedAngleRadians(double Angle) {
+    double temp = Math.signum(Angle);
+    Angle = Math.abs(Angle);
+    Angle = Angle % Math.PI;
+    Angle = Angle * temp;
+    // System.out.printf("This is the actual angle %f and caculated is %f", getAngleRadians(), Angle);
+    return Angle;
+  }
+public double getAngleRadians() {
   return (InvertBack? -1.0 : 1.0) * m_turningEncoder.get() * turningEncoderCounts;
   // return (InvertBack? -1 : 1) * m_turningEncoder.get();
   // return (InvertBack? -1 : 1) * m_turningEncoder.get() * 2 * Math.PI / 418;
@@ -117,26 +127,39 @@ private double getAngleRadians() {
    *
    * @param desiredState Desired state with speed and angle.
    */
-  public void setDesiredState(SwerveModuleState desiredState) {
+  public void setDesiredState(SwerveModuleState desiredState, boolean noMovement) {
+    if (noMovement) {
+//no Movement
+m_driveMotor.set(0);
+m_turningMotor.set(VictorSPXControlMode.PercentOutput, 0);
+    }
+    else {
+//There is movement
+    
+
     // Optimize the reference state to avoid spinning further than 90 degrees
     SwerveModuleState state =
     SwerveModuleState.optimize(desiredState, new Rotation2d(getAngleRadians()));
-    //SwerveModuleState.optimize(desiredState, new Rotation2d(m_turningEncoder.get()));
 
     // Calculate the drive output from the drive PID controller.
-    // final double driveOutput =
-    //     m_drivePIDController.calculate(m_driveEncoder.getVelocity(), state.speedMetersPerSecond);
-
     final double driveOutput = (InvertLeft? -1 : 1) * state.speedMetersPerSecond / DriveConstants.kMaxSpeedMetersPerSecond;
 
     // Calculate the turning motor output from the turning PID controller.
     final var turnOutput =
         m_turningPIDController.calculate(getAngleRadians(), state.angle.getRadians());
-        System.out.println("State: "+state.angle.getRadians()+" Compared to our "+getAngleRadians()+" result is "+turnOutput);
-    // Calculate the turning motor output from the turning PID controller.
-    m_driveMotor.set(driveOutput);
+    
+    var error = Math.abs((state.angle.getRadians() % (2 * Math.PI)) - (getAngleRadians() % (2 * Math.PI)));
+    error = Math.min(error, 2 * Math.PI - error);
+
+    var ready = 1 - error * 2/Math.PI;
+    ready = Math.max(ready, 0);
+    
+    m_driveMotor.set(driveOutput * ready);
     m_turningMotor.set(VictorSPXControlMode.PercentOutput,turnOutput);
-  }
+  
+    // System.out.println(state.angle.getRadians()+","+getAngleRadians()+","+error);
+    }
+}
 
   /** Zeros all the SwerveModule encoders. */
   public void resetEncoders() {

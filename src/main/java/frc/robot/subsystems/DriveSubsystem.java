@@ -121,11 +121,14 @@ m_gyro.getRotation2d(),
                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
     SwerveDriveKinematics.normalizeWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+// System.out.println("State: "+swerveModuleStates[0].angle.getRadians()+", drive: "+xSpeed+" or "+ySpeed+" when at "+m_frontLeft.getAngleRadians());
 
-    m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    m_frontRight.setDesiredState(swerveModuleStates[1]);
-    m_rearLeft.setDesiredState(swerveModuleStates[2]);
-    m_rearRight.setDesiredState(swerveModuleStates[3]);
+boolean noMovement = xSpeed == 0 && ySpeed == 0 && rot == 0;
+
+    m_frontLeft.setDesiredState(swerveModuleStates[0], noMovement);
+    m_frontRight.setDesiredState(swerveModuleStates[1], noMovement);
+    m_rearLeft.setDesiredState(swerveModuleStates[2],noMovement);
+    m_rearRight.setDesiredState(swerveModuleStates[3],noMovement);
   }
 
   /**
@@ -136,10 +139,10 @@ m_gyro.getRotation2d(),
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.normalizeWheelSpeeds(
         desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
-    m_frontLeft.setDesiredState(desiredStates[0]);
-    m_frontRight.setDesiredState(desiredStates[1]);
-    m_rearLeft.setDesiredState(desiredStates[2]);
-    m_rearRight.setDesiredState(desiredStates[3]);
+    m_frontLeft.setDesiredState(desiredStates[0], false);
+    m_frontRight.setDesiredState(desiredStates[1], false);
+    m_rearLeft.setDesiredState(desiredStates[2], false);
+    m_rearRight.setDesiredState(desiredStates[3], false);
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
