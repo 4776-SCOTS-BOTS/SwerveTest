@@ -84,9 +84,13 @@ public final class Constants {
     public static double kRPMToMetersPerSecond = Math.PI * kWheelDiameter / (60 * kMotorGearsToWheelGears);
 
 
-    public static final double kPModuleTurningController = 0.75;
+    public static final double kPModuleTurningController = 1.0;
 
     public static final double kPModuleDriveController = 0.6;
+    private static final double kDriveP = 15.0;
+    private static final double kDriveI = 0.01;
+    private static final double kDriveD = 0.1;
+    private static final double kDriveF = 0.2;
 
     public static final double kFrontLeftTurningEncoderCounts = 2 * Math.PI / 415.1;
     public static final double kFrontRightTurningEncoderCounts = 2 * Math.PI / 415.6;
@@ -96,6 +100,7 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kManipulatorControllerPort = 1;
   }
 
   public static final class AutoConstants {

@@ -43,6 +43,7 @@ public class SwerveModule {
           new TrapezoidProfile.Constraints(
               ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
               ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
+  PIDController turningPID = new PIDController(ModuleConstants.kPModuleTurningController, 0, 0);
 
   /**
    * Constructs a SwerveModule.
@@ -85,6 +86,7 @@ m_driveEncoder.setVelocityConversionFactor(ModuleConstants.kRPMToMetersPerSecond
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.
     m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
+    turningPID.enableContinuousInput(-Math.PI, Math.PI);
 
 Shuffleboard.getTab("swere").addNumber("SwerveModouleTurning"+turningMotorChannel, this::getAngleRadians);
     // Shuffleboard.getTab("Swerve").addNumber("SwerveModule"+driveMotorChannel, m_driveEncoder::getPosition);
@@ -146,15 +148,16 @@ m_turningMotor.set(VictorSPXControlMode.PercentOutput, 0);
 
     // Calculate the turning motor output from the turning PID controller.
     final var turnOutput =
-        m_turningPIDController.calculate(getAngleRadians(), state.angle.getRadians());
-    
+        // m_turningPIDController.calculate(getAngleRadians(), state.angle.getRadians());
+        turningPID.calculate(getAngleRadians(), state.angle.getRadians());
     var error = Math.abs((state.angle.getRadians() % (2 * Math.PI)) - (getAngleRadians() % (2 * Math.PI)));
     error = Math.min(error, 2 * Math.PI - error);
 
     var ready = 1 - error * 2/Math.PI;
     ready = Math.max(ready, 0);
     
-    m_driveMotor.set(driveOutput * ready);
+    m_driveMotor.set(driveOutput * 1);
+    // m_turningMotor.set(VictorSPXControlMode., demand);
     m_turningMotor.set(VictorSPXControlMode.PercentOutput,turnOutput);
   
     // System.out.println(state.angle.getRadians()+","+getAngleRadians()+","+error);

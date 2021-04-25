@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
@@ -39,6 +40,13 @@ public class RobotContainer {
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  XboxController m_manipulatorController = new XboxController(OIConstants.kManipulatorControllerPort);
+
+  private final SlewRateLimiter xSpeedLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter ySpeedLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter rotLimiter = new SlewRateLimiter(3);
+
+  PIDController customAnglePID = new PIDController(0.6, 0, 0);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -66,16 +74,7 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Runnable cheesyDrive = ()->{
-    //     double turn = deadzone(m_driverController.getX(GenericHID.Hand.kRight));
-    //     m_robotDrive.drive(
-    //       -deadzone(m_driverController.getY(GenericHID.Hand.kLeft)), 
-    //       turn, 
-    //       m_driverController.getBumper(GenericHID.Hand.kRight), (l,r)->{
-      //       m_driveTrain.tankDriveVolts(l*10, r*10);
-      //       m_driveTrain.normalTank(l, r);
-      //     });
-      // };
+      customAnglePID.enableContinuousInput(-Math.PI, Math.PI);
       Runnable Control = ()->{
         // m_driverController.getY(GenericHID.Hand.kLeft);
         // m_driverController.getX(GenericHID.Hand.kLeft);
@@ -84,20 +83,29 @@ public class RobotContainer {
         //Create variables for controls
 
         //Swerve xSpeed is the vertical/forward movement
-        double xSpeed = new_deadzone(m_driverController.getY(GenericHID.Hand.kLeft));
+        double xSpeed = DriveConstants.kMaxSpeedMetersPerSecond * xSpeedLimiter.calculate(new_deadzone(m_driverController.getY(GenericHID.Hand.kLeft)));
+        
         //Swerve ySpeed is the sideways left/right movement
-        double ySpeed = new_deadzone(m_driverController.getX(GenericHID.Hand.kLeft));
+        double ySpeed = DriveConstants.kMaxSpeedMetersPerSecond * ySpeedLimiter.calculate(new_deadzone(m_driverController.getX(GenericHID.Hand.kLeft)));
+        
         //Swerve rotation is the counter-clockwise rotation of the robot
-        double rotation = new_deadzone(m_driverController.getX(GenericHID.Hand.kRight));
+        double rotation = DriveConstants.kMaxSpeedMetersPerSecond * rotLimiter.calculate(new_deadzone(m_driverController.getX(GenericHID.Hand.kRight)));
 
         boolean resetRotation = m_driverController.getBumper(GenericHID.Hand.kRight);
         // System.out.println(m_robotDrive.getPose().getRotation().getRadians());
         if (resetRotation) {
           //We want full speed rotation when angle = 45 degrees = pi/4
-          rotation = m_robotDrive.getPose().getRotation().getRadians() * 4 / Math.PI;
+          rotation = m_robotDrive.getPose().getRotation().getRadians() * 8 / Math.PI;
           rotation = Math.min(1, Math.max(-1, rotation));
         }
-
+        //TODO: Driver can OVERRIDE manipulator rotation using right stick down button
+        double rX = m_manipulatorController.getX(GenericHID.Hand.kLeft);
+        double rY = -m_manipulatorController.getY(GenericHID.Hand.kLeft);
+        if (rX * rX + rY * rY > 0.5) {
+          double angle = Math.atan2(rY, rX) + Math.PI/2;
+          // System.out.println("A: "+angle);
+          rotation = customAnglePID.calculate(m_robotDrive.getPose().getRotation().getRadians(), angle);
+        }
         //Call the Method
         m_robotDrive.drive(xSpeed, ySpeed, rotation, true);
       };

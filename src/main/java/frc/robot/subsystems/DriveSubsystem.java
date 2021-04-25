@@ -123,7 +123,7 @@ m_gyro.getRotation2d(),
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
 // System.out.println("State: "+swerveModuleStates[0].angle.getRadians()+", drive: "+xSpeed+" or "+ySpeed+" when at "+m_frontLeft.getAngleRadians());
 
-boolean noMovement = xSpeed == 0 && ySpeed == 0 && rot == 0;
+boolean noMovement = false && xSpeed == 0 && ySpeed == 0 && rot == 0;
 
     m_frontLeft.setDesiredState(swerveModuleStates[0], noMovement);
     m_frontRight.setDesiredState(swerveModuleStates[1], noMovement);
