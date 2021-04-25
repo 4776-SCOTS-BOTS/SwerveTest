@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
 
+
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -88,6 +89,15 @@ public class RobotContainer {
         double ySpeed = new_deadzone(m_driverController.getX(GenericHID.Hand.kLeft));
         //Swerve rotation is the counter-clockwise rotation of the robot
         double rotation = new_deadzone(m_driverController.getX(GenericHID.Hand.kRight));
+
+        boolean resetRotation = m_driverController.getBumper(GenericHID.Hand.kRight);
+        // System.out.println(m_robotDrive.getPose().getRotation().getRadians());
+        if (resetRotation) {
+          //We want full speed rotation when angle = 45 degrees = pi/4
+          rotation = m_robotDrive.getPose().getRotation().getRadians() * 4 / Math.PI;
+          rotation = Math.min(1, Math.max(-1, rotation));
+        }
+
         //Call the Method
         m_robotDrive.drive(xSpeed, ySpeed, rotation, true);
       };
