@@ -59,7 +59,7 @@ public final class Constants {
     // our starting pose is 5 meters along the long end of the field and in the
     // center of the field along the short end, facing forward.
     public static final boolean kGyroReversed = false;
-	public static double kMaxSpeedMetersPerSecond = 3;
+	public static double kMaxSpeedMetersPerSecond = 1;
 	
   }
 

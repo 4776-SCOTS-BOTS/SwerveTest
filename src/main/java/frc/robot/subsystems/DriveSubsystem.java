@@ -151,11 +151,11 @@ boolean noMovement = false && xSpeed == 0 && ySpeed == 0 && rot == 0;
     m_rearLeft.resetEncoders();
     m_frontRight.resetEncoders();
     m_rearRight.resetEncoders();
-  }
+}
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    m_gyro.reset();
+    //m_gyro.reset();
   }
 
   /**

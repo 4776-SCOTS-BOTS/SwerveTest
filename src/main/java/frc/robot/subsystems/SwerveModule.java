@@ -83,7 +83,7 @@ m_driveEncoder.setVelocityConversionFactor(ModuleConstants.kRPMToMetersPerSecond
     // Set whether turning encoder should be reversed or not
     m_turningEncoder.setReverseDirection(turningEncoderReversed);
 
-    // Limit the PID Controller's input range between -pi and pi and set the input
+    // Limit the PID Controller's input range between -4 and 4 and set the input
     // to be continuous.
     m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
     turningPID.enableContinuousInput(-Math.PI, Math.PI);
@@ -165,6 +165,7 @@ m_turningMotor.set(VictorSPXControlMode.PercentOutput, 0);
 }
 
   /** Zeros all the SwerveModule encoders. */
+  //resetEncoders does not remove field oriented drive
   public void resetEncoders() {
     m_driveEncoder.setPosition(0);
     m_turningEncoder.reset();
